@@ -9,8 +9,8 @@ if [ -d "$PARENT_DIR/SideStore" ]; then
 else
   SS_DIR="$LC_DIR/SideStore-src"
   if [ ! -d "$SS_DIR/.git" ]; then
-    echo "==> Cloning KSLengYu/SideStore (LiveContainerSupport)..."
-    git clone --recursive -b LiveContainerSupport https://github.com/KSLengYu/SideStore.git "$SS_DIR"
+    echo "==> Cloning KSLengYu/SideStore-zh_CN (LiveContainerSupport)..."
+    git clone --recursive -b LiveContainerSupport https://github.com/KSLengYu/SideStore-zh_CN.git "$SS_DIR"
   fi
 fi
 

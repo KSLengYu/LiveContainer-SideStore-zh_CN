@@ -2,6 +2,8 @@ name: Xcode - Build
 
 on:
   push:
+    paths-ignore:
+      - '**.md'
   pull_request:
   workflow_dispatch:
     inputs:
@@ -12,7 +14,7 @@ on:
 
 jobs:
   build:
-    name: Build LiveContainer & SideStore (zh-CN)
+    name: Build LiveContainer+SideStore & SideStore (zh-CN)
     runs-on: xcode-27
     env:
       archive_path: archive
@@ -22,10 +24,10 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Checkout SideStore (KSLengYu LiveContainerSupport)
+      - name: Checkout SideStore-zh_CN (LiveContainerSupport)
         uses: actions/checkout@v6
         with:
-          repository: KSLengYu/SideStore
+          repository: KSLengYu/SideStore-zh_CN
           ref: LiveContainerSupport
           path: SideStore-src
           submodules: recursive
@@ -76,12 +78,6 @@ jobs:
       - name: Package IPAs
         run: bash .github/build_github.sh
 
-      - name: Upload LiveContainer.ipa
-        uses: actions/upload-artifact@v7
-        with:
-          name: LiveContainer.ipa
-          path: LiveContainer.ipa
-
       - name: Upload LiveContainer+SideStore.ipa
         uses: actions/upload-artifact@v7
         with:
@@ -106,11 +102,6 @@ jobs:
       cancel-in-progress: true
 
     steps:
-      - name: Download LiveContainer.ipa
-        uses: actions/download-artifact@v8
-        with:
-          name: LiveContainer.ipa
-
       - name: Download LiveContainer+SideStore.ipa
         uses: actions/download-artifact@v8
         with:
@@ -130,8 +121,7 @@ jobs:
             **Commit:** [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
             **Message:** ${{ github.event.head_commit.message }}
 
-            自动构建自 [GitHub Actions](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }})（基于 LiveContainer + [KSLengYu/SideStore](https://github.com/KSLengYu/SideStore) 简体中文增强分支）。
+            自动构建自 [GitHub Actions](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }})（基于 LiveContainer + [KSLengYu/SideStore-zh_CN](https://github.com/KSLengYu/SideStore-zh_CN) 简体中文分支）。
           files: |
             LiveContainer+SideStore.ipa
-            LiveContainer.ipa
             SideStore-zh_CN.ipa

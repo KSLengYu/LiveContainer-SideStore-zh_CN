@@ -53,7 +53,7 @@ struct LCSettingsView: View {
     @AppStorage("LCStrictHiding", store: LCUtils.appGroupUserDefault) var strictHiding = false
     @AppStorage("dynamicColors", store: LCUtils.appGroupUserDefault) var dynamicColors = true
     @AppStorage("darkModeIcon", store: LCUtils.appGroupUserDefault) var darkModeIcon = false
-    @AppStorage("LCUserLanguage") var userLanguage = "system"
+    @AppStorage("LCUserLanguage") var userLanguage = LCLanguageManager.defaultLanguage
     @ObservedObject private var langManager = LCLanguageManager.shared
     
     @AppStorage("LCSideJITServerAddress", store: LCUtils.appGroupUserDefault) var sideJITServerAddress : String = ""

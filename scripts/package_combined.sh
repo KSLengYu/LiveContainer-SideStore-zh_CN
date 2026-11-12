@@ -10,7 +10,7 @@ DYLIBIFY="${DYLIBIFY:-$LC_DIR/dylibify}"
 
 mkdir -p "$OUT_DIR"
 
-echo "==> [pkg 1/3] Signing SideStore components and packaging SideStore-zh_CN.ipa..."
+echo "==> [pkg 1/2] Signing SideStore components and packaging SideStore-zh_CN.ipa..."
 APP_DIR="$SS_ARCHIVE/Products/Applications/SideStore.app"
 
 cp -R "$SS_DIR/AltStore/Resources/zh-Hans.lproj" "$APP_DIR/"
@@ -55,22 +55,11 @@ zip -qr "$OUT_DIR/SideStore-zh_CN.ipa" Payload -x "._*" -x ".DS_Store" -x "__MAC
 popd > /dev/null
 rm -rf "$SS_DIR/Payload"
 
-echo "==> [pkg 2/3] Packaging standalone LiveContainer.ipa..."
+echo "==> [pkg 2/2] Building combined LiveContainer+SideStore.ipa..."
 cd "$LC_DIR"
-rm -rf Payload tmp "$OUT_DIR/LiveContainer.ipa" "$OUT_DIR/LiveContainer+SideStore.ipa"
+rm -rf Payload tmp "$OUT_DIR/LiveContainer+SideStore.ipa"
 cp -R "$LC_ARCHIVE/Products/Applications" Payload
 
-mkdir -p tmp
-if [ -d Payload/LiveContainer.app/Frameworks/SideStoreSupport.framework ]; then
-  mv Payload/LiveContainer.app/Frameworks/SideStoreSupport.framework ./tmp/
-fi
-zip -qr "$OUT_DIR/LiveContainer.ipa" Payload -x "._*" -x ".DS_Store" -x "__MACOSX"
-if [ -d ./tmp/SideStoreSupport.framework ]; then
-  mv ./tmp/SideStoreSupport.framework Payload/LiveContainer.app/Frameworks/
-fi
-rm -rf tmp
-
-echo "==> [pkg 3/3] Building combined LiveContainer+SideStore.ipa..."
 /usr/libexec/PlistBuddy -c 'Add :ALTAppGroups array' ./Payload/LiveContainer.app/Info.plist || true
 /usr/libexec/PlistBuddy -c 'Add :ALTAppGroups: string group.com.SideStore.SideStore' ./Payload/LiveContainer.app/Info.plist || true
 

@@ -4,27 +4,28 @@
    
 
 <div align="center">
-  <h1><b>LiveContainer + SideStore (zh-CN 中文增强分支)</b></h1>
-  <p><i>基于 LiveContainer 与 SideStore 的简体中文增强定制分支 · 支持应用内切换语言（重启后生效）</i></p>
+  <h1><b>LiveContainer + SideStore (zh-CN)</b></h1>
+  <p><i>基于 LiveContainer 与 SideStore 的简体中文分支，支持应用内中英文切换（重启后生效） / Simplified Chinese branch of LiveContainer + SideStore with in-app language switching (restart required)</i></p>
 </div>
 
 > [!NOTE]
-> **分支说明**：本仓库是基于上游 [LiveContainer/LiveContainer](https://github.com/LiveContainer/LiveContainer) 定制维护的中文增强分支（合体版工程）；内置的 SideStore 来自独立维护的 [KSLengYu/SideStore (`LiveContainerSupport` 分支)](https://github.com/KSLengYu/SideStore)。
+> **分支说明 / Branch Info**：  
+> 本仓库是基于上游 [LiveContainer/LiveContainer](https://github.com/LiveContainer/LiveContainer) 的简体中文分支仓库；合体版内置的中文版 SideStore 来自 [KSLengYu/SideStore-zh_CN (`LiveContainerSupport` 分支)](https://github.com/KSLengYu/SideStore-zh_CN)。  
+> This repository is a Simplified Chinese branch based on [LiveContainer/LiveContainer](https://github.com/LiveContainer/LiveContainer), bundled with the Chinese SideStore build from [KSLengYu/SideStore-zh_CN (`LiveContainerSupport`)](https://github.com/KSLengYu/SideStore-zh_CN).
 
-## 本分支新增与优化内容
+## 本分支修改内容 / What's Changed
 
-### 1. LiveContainer（LS）应用内语言切换
-- **设置页多语言选择器**：在 LiveContainer 设置页新增「语言」切换（支持 `跟随系统`、`简体中文`、`繁體中文`、`English`、`日本語`）。
-- **重启后生效机制**：切换语言时锁定当前运行时语言，不中途篡改当前界面文案；切换完成后自动弹出重启提示框（并在设置项下方保留`需要重启应用（点击立即重启）`按钮），确认后通过 `LCSharedUtils.relaunchLiveContainer()` 自动重启并应用新语言。
+### 中文说明
+- **LiveContainer 应用内语言切换（重启后生效）**：在 LiveContainer 设置页新增语言选择器（支持 `简体中文` / `English`），切换时不直接改写当前运行界面，而是自动弹出重启确认框并在页面内保留「需要重启应用（点击立即重启）」按钮，确认后自动重启并应用新语言。
+- **SideStore 完整汉化与语言切换**：完整合入 SideStore 简体中文翻译并将字库打包至合体版 `LiveContainer.app` 中；SideStore「设置 → 个性化外观 → 语言」支持在 `简体中文` 与 `English` 间切换，同样在重启后生效并支持自动重开。
+- **Apple ID 登录与异常恢复优化**：默认关闭存在兼容问题的设备端独立 Anisette，并在连续登录失败或遇到 `-80045` 异常时提供恢复弹窗（关闭设备端独立 Anisette 并重置 `adi.pb`）。
+- **自动化打包与 GitHub Actions**：提供 [`scripts/build_local.sh`](./scripts/build_local.sh) 与 [`scripts/package_combined.sh`](./scripts/package_combined.sh)（搭配 [`scripts/merge_strings.py`](./scripts/merge_strings.py)），云端工作流自动编译输出 **`LiveContainer+SideStore.ipa`** 与独立版 **`SideStore-zh_CN.ipa`**（不生成单独版 LiveContainer IPA）并发布至 Releases。
 
-### 2. SideStore（SS）完整汉化与稳定性优化
-- **简体中文全量适配**：完整合入 SideStore 简体中文翻译（涵盖动态页、软件源、储存空间浏览器、恢复与备份、新手引导、Apple ID 登录及恢复弹窗等），并将内置 SideStore 中文字库合并打包进合体版 `LiveContainer.app` 资源中。
-- **SideStore 应用内语言切换（重启后生效）**：在 SideStore「设置 → 个性化外观 → 语言」中提供语言切换，锁定运行时语言并在重启后完全生效，合体版内确认重启可自动重开回 SideStore。
-- **登录与崩溃修复**：修复部分界面/登录与团队选择卡片引起的闪退问题；默认关闭存在兼容问题的设备端独立 Anisette，并在连续登录失败或出现 `-80045` 异常时提供关闭设备端独立 Anisette 与重置 `adi.pb` 的恢复弹窗。
-
-### 3. 本地一键脚本 & GitHub Actions 云端自动构建
-- **本地打包**：提供通用脚本 [`scripts/build_local.sh`](./scripts/build_local.sh) 与 [`scripts/package_combined.sh`](./scripts/package_combined.sh)（搭配 [`scripts/merge_strings.py`](./scripts/merge_strings.py)），可一键同时编出 `LiveContainer+SideStore.ipa`、`LiveContainer.ipa` 与 `SideStore-zh_CN.ipa`。
-- **GitHub Actions 自动构建**：每次推送到默认分支时，云端会自动拉取本仓库与 `KSLengYu/SideStore`（`LiveContainerSupport` 分支），编译打包并发布至本仓库 **Nightly Releases**。
+### English Overview
+- **In-App Language Switching for LiveContainer (Restart Required)**: Added an in-app language picker (`简体中文` / `English`) in LiveContainer Settings. Changes take effect after restart via a prompt alert and an inline restart button that automatically relaunches LiveContainer.
+- **Full Simplified Chinese Localization & Language Switching for SideStore**: Embedded Simplified Chinese translations from [KSLengYu/SideStore-zh_CN](https://github.com/KSLengYu/SideStore-zh_CN) into the combined bundle; SideStore Settings also supports switching between `简体中文` and `English` (effective after restart).
+- **Apple ID Sign-In & Recovery Improvements**: Improved `-80045` / Anisette compatibility and added a recovery alert after repeated sign-in failures to disable On-Device Anisette and reset `adi.pb`.
+- **Automated Packaging & CI**: Includes local build scripts and GitHub Actions workflow outputting `LiveContainer+SideStore.ipa` and standalone `SideStore-zh_CN.ipa`.
 
 ---
 

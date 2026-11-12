@@ -158,29 +158,46 @@ class InputHelper : AlertHelper<String> {
 public class LCLanguageManager: ObservableObject {
     public static let shared = LCLanguageManager()
     
-    @AppStorage("LCUserLanguage") public var currentLanguage: String = "system"
+    public static var defaultLanguage: String {
+        if let preferred = Locale.preferredLanguages.first, preferred.hasPrefix("zh") {
+            return "zh-Hans"
+        }
+        return "en"
+    }
+    
+    public static func normalizedLanguage(_ raw: String?) -> String {
+        switch raw {
+        case "zh-Hans", "zh-CN", "zh_CN":
+            return "zh-Hans"
+        case "en":
+            return "en"
+        default:
+            return defaultLanguage
+        }
+    }
+    
+    @AppStorage("LCUserLanguage") public var currentLanguage: String = LCLanguageManager.defaultLanguage
     public let activeLanguage: String
     @Published public var needsRestart = false
     
     private init() {
-        self.activeLanguage = UserDefaults.standard.string(forKey: "LCUserLanguage") ?? "system"
+        let resolved = Self.normalizedLanguage(UserDefaults.standard.string(forKey: "LCUserLanguage"))
+        if UserDefaults.standard.string(forKey: "LCUserLanguage") != resolved {
+            UserDefaults.standard.set(resolved, forKey: "LCUserLanguage")
+            UserDefaults.standard.synchronize()
+        }
+        self.activeLanguage = resolved
     }
     
     public static let supportedLanguages: [(code: String, name: String)] = [
-        ("system", "跟随系统 / Follow System"),
         ("zh-Hans", "简体中文"),
-        ("zh-Hant", "繁體中文"),
-        ("en", "English"),
-        ("ja", "日本語")
+        ("en", "English")
     ]
     
     private var cachedBundle: (String, Bundle?)?
     
     public var currentBundle: Bundle? {
         let lang = activeLanguage
-        if lang == "system" || lang.isEmpty {
-            return nil
-        }
         if let cached = cachedBundle, cached.0 == lang {
             return cached.1
         }
@@ -196,14 +213,11 @@ public class LCLanguageManager: ObservableObject {
     }
     
     public func setLanguage(_ code: String) {
-        currentLanguage = code
-        if code == "system" {
-            UserDefaults.standard.removeObject(forKey: "AppleLanguages")
-        } else {
-            UserDefaults.standard.set([code], forKey: "AppleLanguages")
-        }
+        let resolved = Self.normalizedLanguage(code)
+        currentLanguage = resolved
+        UserDefaults.standard.set([resolved], forKey: "AppleLanguages")
         UserDefaults.standard.synchronize()
-        needsRestart = (code != activeLanguage)
+        needsRestart = (resolved != activeLanguage)
     }
 }
 

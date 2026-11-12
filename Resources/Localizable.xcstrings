@@ -32817,22 +32817,10 @@
             "value" : "Language updated. Restart the app for all views to take effect."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "言語を変更しました。すべての画面に反映するにはアプリを再起動してください。"
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "语言切换成功，需要重启应用以使全部界面完全生效。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "語言切換成功，需要重新啟動應用程式以使所有介面完全生效。"
           }
         }
       }
@@ -32846,22 +32834,10 @@
             "value" : "Restart Required"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "再起動が必要です"
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "需要重启应用"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "需要重新啟動"
           }
         }
       }
@@ -32875,22 +32851,10 @@
             "value" : "Restart Required (Tap to Restart)"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "再起動が必要です（タップして再起動）"
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "需要重启应用（点击立即重启）"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "需要重新啟動（點擊立即重啟）"
           }
         }
       }
@@ -32904,22 +32868,10 @@
             "value" : "Later"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "後で"
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "稍后重启"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "稍後重啟"
           }
         }
       }
@@ -32933,22 +32885,10 @@
             "value" : "Restart Now"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "今すぐ再起動"
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "立即重启"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "立即重啟"
           }
         }
       }
