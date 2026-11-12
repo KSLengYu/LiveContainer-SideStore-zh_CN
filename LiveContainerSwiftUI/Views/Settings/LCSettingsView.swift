@@ -53,6 +53,8 @@ struct LCSettingsView: View {
     @AppStorage("LCStrictHiding", store: LCUtils.appGroupUserDefault) var strictHiding = false
     @AppStorage("dynamicColors", store: LCUtils.appGroupUserDefault) var dynamicColors = true
     @AppStorage("darkModeIcon", store: LCUtils.appGroupUserDefault) var darkModeIcon = false
+    @AppStorage("LCUserLanguage") var userLanguage = "system"
+    @ObservedObject private var langManager = LCLanguageManager.shared
     
     @AppStorage("LCSideJITServerAddress", store: LCUtils.appGroupUserDefault) var sideJITServerAddress : String = ""
     @AppStorage("LCDeviceUDID", store: LCUtils.appGroupUserDefault) var deviceUDID: String = ""
@@ -71,6 +73,7 @@ struct LCSettingsView: View {
     @EnvironmentObject private var sharedModel : SharedModel
     
     @State private var isViewAppeared = false
+    @State private var showLanguageRestartAlert = false
     
     let storeName = LCUtils.getStoreName()
     
@@ -215,6 +218,36 @@ struct LCSettingsView: View {
                     Text("lc.settings.interface".loc)
                 } footer: {
                     Text("lc.settings.dynamicColors.desc".loc)
+                }
+                
+                Section {
+                    Picker(selection: $userLanguage) {
+                        ForEach(LCLanguageManager.supportedLanguages, id: \.code) { lang in
+                            Text(lang.name).tag(lang.code)
+                        }
+                    } label: {
+                        Text("lc.settings.language".loc)
+                    }
+                    .onChange(of: userLanguage) { newLang in
+                        LCLanguageManager.shared.setLanguage(newLang)
+                        if LCLanguageManager.shared.needsRestart {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                                showLanguageRestartAlert = true
+                            }
+                        }
+                    }
+                    if langManager.needsRestart {
+                        Button {
+                            restartApp()
+                        } label: {
+                            Label("lc.settings.languageRestartButton".loc, systemImage: "arrow.clockwise")
+                                .foregroundColor(.orange)
+                        }
+                    }
+                } header: {
+                    Text("lc.settings.languageHeader".loc)
+                } footer: {
+                    Text("lc.settings.languageFooter".loc)
                 }
                 Section{
                     Toggle(isOn: $frameShortIcon) {
@@ -444,6 +477,14 @@ struct LCSettingsView: View {
             )
         }
         .navigationViewStyle(StackNavigationViewStyle())
+        .alert("lc.settings.languageChangedTitle".loc, isPresented: $showLanguageRestartAlert) {
+            Button("lc.settings.languageRestartNow".loc) {
+                restartApp()
+            }
+            Button("lc.settings.languageRestartLater".loc, role: .cancel) {}
+        } message: {
+            Text("lc.settings.languageChangedMessage".loc)
+        }
         .onAppear() {
             if !isViewAppeared {
                 guard sharedModel.selectedTab == .settings, let link = sharedModel.deepLink else { return }
@@ -469,6 +510,11 @@ struct LCSettingsView: View {
     
     func openTwitter() {
         UIApplication.shared.open(URL(string: "https://twitter.com/khanhduytran0")!)
+    }
+
+    func restartApp() {
+        UserDefaults.standard.synchronize()
+        LCSharedUtils.relaunchLiveContainer()
     }
 
     func clearNotifications() {

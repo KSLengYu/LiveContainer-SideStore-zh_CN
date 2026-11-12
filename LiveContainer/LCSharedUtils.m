@@ -169,6 +169,20 @@ NSString* FBSOpenApplicationOptionKeyPayloadURL = @"__PayloadURL";
     return YES;
 }
 
++ (void)relaunchBuiltinSideStore {
+    [lcUserDefaults setObject:@"builtinSideStore" forKey:@"selected"];
+    [lcUserDefaults synchronize];
+    [self launchToGuestAppWithClassicMode:0];
+}
+
++ (void)relaunchLiveContainer {
+    [lcUserDefaults removeObjectForKey:@"selected"];
+    [lcUserDefaults removeObjectForKey:@"selectedContainer"];
+    [lcUserDefaults synchronize];
+    [NSUserDefaults.standardUserDefaults synchronize];
+    [self launchToGuestAppWithClassicMode:0];
+}
+
 + (BOOL)launchToGuestAppWithURL:(NSURL *)url {
     NSURLComponents* components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
     if(![components.host isEqualToString:@"livecontainer-launch"]) return NO;

@@ -155,6 +155,58 @@ class InputHelper : AlertHelper<String> {
     }
 }
 
+public class LCLanguageManager: ObservableObject {
+    public static let shared = LCLanguageManager()
+    
+    @AppStorage("LCUserLanguage") public var currentLanguage: String = "system"
+    public let activeLanguage: String
+    @Published public var needsRestart = false
+    
+    private init() {
+        self.activeLanguage = UserDefaults.standard.string(forKey: "LCUserLanguage") ?? "system"
+    }
+    
+    public static let supportedLanguages: [(code: String, name: String)] = [
+        ("system", "跟随系统 / Follow System"),
+        ("zh-Hans", "简体中文"),
+        ("zh-Hant", "繁體中文"),
+        ("en", "English"),
+        ("ja", "日本語")
+    ]
+    
+    private var cachedBundle: (String, Bundle?)?
+    
+    public var currentBundle: Bundle? {
+        let lang = activeLanguage
+        if lang == "system" || lang.isEmpty {
+            return nil
+        }
+        if let cached = cachedBundle, cached.0 == lang {
+            return cached.1
+        }
+        
+        var bundle: Bundle? = nil
+        if let path = Bundle.main.path(forResource: lang, ofType: "lproj") {
+            bundle = Bundle(path: path)
+        } else if lang == "zh-Hans", let path = Bundle.main.path(forResource: "zh_CN", ofType: "lproj") {
+            bundle = Bundle(path: path)
+        }
+        cachedBundle = (lang, bundle)
+        return bundle
+    }
+    
+    public func setLanguage(_ code: String) {
+        currentLanguage = code
+        if code == "system" {
+            UserDefaults.standard.removeObject(forKey: "AppleLanguages")
+        } else {
+            UserDefaults.standard.set([code], forKey: "AppleLanguages")
+        }
+        UserDefaults.standard.synchronize()
+        needsRestart = (code != activeLanguage)
+    }
+}
+
 extension String: @retroactive Error {}
 extension String: @retroactive LocalizedError {
     public var errorDescription: String? { return self }
@@ -167,6 +219,13 @@ extension String: @retroactive LocalizedError {
     }()
     
     var loc: String {
+        if let bundle = LCLanguageManager.shared.currentBundle {
+            let message = bundle.localizedString(forKey: self, value: nil, table: nil)
+            if message != self {
+                return message
+            }
+        }
+        
         let message = NSLocalizedString(self, comment: "")
         if message != self {
             return message

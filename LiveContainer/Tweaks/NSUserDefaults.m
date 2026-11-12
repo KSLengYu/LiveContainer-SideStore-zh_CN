@@ -73,6 +73,18 @@ void NUDGuestHooksInit(void) {
 
 #if !TARGET_OS_SIMULATOR
     NSString* selectedLanguage = NSUserDefaults.guestAppInfo[@"LCSelectedLanguage"];
+    if (!selectedLanguage || selectedLanguage.length == 0) {
+        NSString *ssLang = [newStandardUserDefaults stringForKey:@"SideStoreSelectedLanguage"];
+        if (!ssLang || ssLang.length == 0) {
+            ssLang = [NSUserDefaults.lcUserDefaults stringForKey:@"SideStoreSelectedLanguage"];
+        }
+        if (!ssLang || ssLang.length == 0) {
+            ssLang = [NSUserDefaults.lcUserDefaults stringForKey:@"LCUserLanguage"];
+        }
+        if (ssLang && ssLang.length > 0 && ![ssLang isEqualToString:@"system"]) {
+            selectedLanguage = ssLang;
+        }
+    }
     if(selectedLanguage) {
         [newStandardUserDefaults setObject:@[selectedLanguage] forKey:@"AppleLanguages"];
         CFMutableArrayRef* _CFBundleUserLanguages = getCachedSymbol(@"__CFBundleUserLanguages", coreFoundationHeader);
