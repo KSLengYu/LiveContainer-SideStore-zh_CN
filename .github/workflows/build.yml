@@ -112,16 +112,38 @@ jobs:
         with:
           name: SideStore-zh_CN.ipa
 
-      - name: Nightly Release
-        uses: andelf/nightly-release@5834076edc55cc05975561c9722043f072ac5c26
+      - name: Publish Latest Release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          body: |
-            **Commit:** [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
-            **Message:** ${{ github.event.head_commit.message }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+        run: |
+          RELEASE_TAG="nightly"
+          RELEASE_TITLE="Nightly Release @ $(date -u +%Y%m%d)"
 
-            自动构建自 [GitHub Actions](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }})（基于 LiveContainer + [KSLengYu/SideStore-zh_CN](https://github.com/KSLengYu/SideStore-zh_CN) 简体中文分支）。
-          files: |
-            LiveContainer+SideStore.ipa
-            SideStore-zh_CN.ipa
+          {
+            printf '**Commit:** [%s](https://github.com/%s/commit/%s)\n' "${{ github.sha }}" "${{ github.repository }}" "${{ github.sha }}"
+            printf '**Message:** %s\n\n' "$COMMIT_MSG"
+            printf '自动构建自 [GitHub Actions](%s/%s/actions/runs/%s/attempts/%s)（基于 LiveContainer + [KSLengYu/SideStore-zh_CN](https://github.com/KSLengYu/SideStore-zh_CN) 简体中文分支）。\n' "${{ github.server_url }}" "${{ github.repository }}" "${{ github.run_id }}" "${{ github.run_attempt }}"
+          } > release-notes.md
+
+          if gh api "repos/${{ github.repository }}/git/ref/tags/$RELEASE_TAG" >/dev/null 2>&1; then
+            gh api -X PATCH "repos/${{ github.repository }}/git/refs/tags/$RELEASE_TAG" -f sha="${{ github.sha }}" -F force=true >/dev/null
+          else
+            gh api -X POST "repos/${{ github.repository }}/git/refs" -f ref="refs/tags/$RELEASE_TAG" -f sha="${{ github.sha }}" >/dev/null
+          fi
+
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" LiveContainer+SideStore.ipa SideStore-zh_CN.ipa --clobber
+            gh release edit "$RELEASE_TAG" \
+              --title "$RELEASE_TITLE" \
+              --notes-file release-notes.md \
+              --prerelease=false \
+              --latest
+          else
+            gh release create "$RELEASE_TAG" LiveContainer+SideStore.ipa SideStore-zh_CN.ipa \
+              --target "${{ github.sha }}" \
+              --title "$RELEASE_TITLE" \
+              --notes-file release-notes.md \
+              --latest
+          fi
